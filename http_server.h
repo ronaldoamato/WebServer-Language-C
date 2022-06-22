@@ -1,0 +1,2 @@
+#define MAX_CONNECTIONS 5
+#define MESSAGE_SIZE 2048
