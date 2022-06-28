@@ -1,6 +1,8 @@
 #include <stdio.h>  /* defines FILENAME_MAX */
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <limits.h>
 #ifdef WINDOWS
 #include <direct.h>
 #define GetCurrentDir _getcwd
@@ -13,9 +15,13 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include "http_server.h"
+#include <pthread.h>
 
 
-void readFile(int socket) {
+
+void * readFile(void* pcli_socket) {            //recebe por parametro o socket instanciado em main
+    int socket = *((int*)pcli_socket);          // copia para variavel local e libera o ponteiro
+    free (pcli_socket);
     char *buffer;
     char buff[FILENAME_MAX],currentDir[FILENAME_MAX];
     char http_message_200[] = "HTTP/1.0 200 OK\r\nLocation: http://localhost:5000\r\nServer: Apache/0.8.4\r\nContent-Type: text/html\r\n\r\n";
