@@ -28,21 +28,19 @@ int main(){
 
     while(1){
         printf ("Aguardando conexões...\n");
-        if((client_connect = accept(server, (struct sockaddr *) &caddr, &csize))==true){
-            printf ("Conectado!");
-            message_rsv = recv(client_connect, buff, sizeof buff, 0);
-        //readFile(client_connect);
+        
+        client_connect=accept(server, (struct sockaddr *) &caddr, &csize);
+        message_rsv = recv(client_connect, buff, sizeof buff, 0);
 
-            pthread_t thread;                                       //instancia uma thread caso receba um pedido de conexão
-            int *pcli_socket = malloc(sizeof(int));                 // aloca em heap 
-            *pcli_socket = client_connect;                          // aloca o socket
-            pthread_create(&thread, NULL, readFile, pcli_socket);   // chama a função de tratamento da requisição readFile
-        }
+        pthread_t thread;
+        int *pcli_socket = malloc(sizeof(int));             
+        *pcli_socket = client_connect;
+                
+        pthread_create(&thread, NULL, readFile, pcli_socket);   // chama a função de tratamento da requisição readFile
+
         //send(client_connect, buff, client_connect, 0);
-        puts(buff);
+        printf("%s",buff);
         fflush(stdout);
-
-        close(client_connect);
     }
 
     return 0;

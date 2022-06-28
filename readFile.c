@@ -22,20 +22,21 @@
 void * readFile(void* pcli_socket) {            //recebe por parametro o socket instanciado em main
     int socket = *((int*)pcli_socket);          // copia para variavel local e libera o ponteiro
     free (pcli_socket);
+    
     char *buffer;
     char buff[FILENAME_MAX],currentDir[FILENAME_MAX];
+    
     char http_message_200[] = "HTTP/1.0 200 OK\r\nLocation: http://localhost:5000\r\nServer: Apache/0.8.4\r\nContent-Type: text/html\r\n\r\n";
     char http_message_400[] = "HTTP/1.0 400 Bad Request\r\nLocation: http://localhost:5000\r\nServer: Apache/0.8.4\r\nContent-Type: text/html\r\n\r\n";
+    FILE *fp;
 
     GetCurrentDir( currentDir, FILENAME_MAX );
     strcpy(buff,currentDir);
     strcat(buff,"/htdocs/index.html");
-    puts(buff);
-    FILE *fp;
-
 
     fp = fopen(buff, "r");
     if (fp != NULL) {
+
         fseek(fp, 0, SEEK_END); // tamanho do arquivo
         long bytes_read = ftell(fp);
         fseek(fp, 0, SEEK_SET);
@@ -49,21 +50,26 @@ void * readFile(void* pcli_socket) {            //recebe por parametro o socket 
         free(buffer);
 
         fclose(fp);
+        close(socket);
     }
     else{
         strcpy(buff,currentDir);
         strcat(buff,"/htdocs/400.html");
+        
         fp = fopen(buff, "r");
+        
         fseek(fp, 0, SEEK_END); // tamanho do arquivo
         long bytes_read = ftell(fp);
         fseek(fp, 0, SEEK_SET);
+        
         send(socket, http_message_400 , strlen(http_message_400)+1, 0);
-                buffer = (char *)malloc(bytes_read * sizeof(char)); 
+        buffer = (char *)malloc(bytes_read * sizeof(char)); 
           
         fread(buffer, bytes_read, 1, fp); // lê o buffer
         write (socket, buffer, bytes_read); //envia html para cliente
         free(buffer);
 
         fclose(fp);
+        close(socket);
     }
 }
