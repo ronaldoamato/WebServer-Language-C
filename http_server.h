@@ -4,4 +4,5 @@
     
 //DECLARACAO DA FUNCOES
 int initServer(struct sockaddr_in caddr,struct sockaddr_in saddr);
-void readFile(int socket);
+//void readFile(int socket);
+void * readFile(void* pcli_socket);
