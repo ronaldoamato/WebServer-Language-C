@@ -16,13 +16,18 @@
 #include <arpa/inet.h>
 #include "http_server.h"
 #include <pthread.h>
-
-
+#include <time.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <semaphore.h>
+#include <fcntl.h>
 
 void * readFile(void* pcli_socket) {            //recebe por parametro o socket instanciado em main
     int socket = *((int*)pcli_socket);          // copia para variavel local e libera o ponteiro
     free (pcli_socket);
     
+    req.tv_sec = 0;
     char *buffer;
     char buff[FILENAME_MAX],currentDir[FILENAME_MAX];
     
@@ -72,4 +77,24 @@ void * readFile(void* pcli_socket) {            //recebe por parametro o socket 
         fclose(fp);
         close(socket);
     }
+}
+
+
+
+void *readMessage( void *pcli_socket) {
+    char message[MESSAGE_SIZE];
+    int p_request;
+    
+    int new_socket_client = *((int *)pcli_socket);
+
+    p_request =  recv(new_socket_client, message, MESSAGE_SIZE, 0);
+    readRequest(message, (void *)pcli_socket);
+}
+
+
+
+void readRequest(char *message, void *pcli_socket) {
+    sem_wait(&mutex);
+    readFile(pcli_socket);
+    sem_post(&mutex);
 }
