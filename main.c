@@ -10,8 +10,15 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include "http_server.h"
+#include <ctype.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/time.h>
+#include <time.h>
 
 int main(){
+
+    sem_init(&mutex, 0, 1);
 
     struct sockaddr_in caddr;
     struct sockaddr_in saddr = {
@@ -36,9 +43,10 @@ int main(){
         int *pcli_socket = malloc(sizeof(int));             
         *pcli_socket = client_connect;
                 
-        pthread_create(&thread, NULL, readFile, pcli_socket);   // chama a função de tratamento da requisição readFile
+        if (pthread_create(&thread, NULL, readMessage, pcli_socket)<0){
+            printf("Erro ao instanciar nova thread");
+        }   // chama a função de tratamento da requisição readMessage
 
-        //send(client_connect, buff, client_connect, 0);
         printf("%s",buff);
         fflush(stdout);
     }
